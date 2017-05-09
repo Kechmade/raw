@@ -96,6 +96,9 @@
     var colors = chart.color()
         .title("Color scale")
         
+    var fontSize = chart.color()
+        .title("Color scale")
+        
 
     chart.draw(function (selection, data){
 
@@ -121,15 +124,20 @@
 						d3.max(values, function(d){ return d.end; })
 					]);
 
-				var xAxis = d3.svg.axis().scale(x).orient('bottom')
-				.tickFormat(d3.time.format("%Y-%m-%d"));; 
+				var xAxis = d3.svg.axis().scale(x).tickSize(-height()).tickSubdivide(true).orient("bottom").tickFormat(d3.time.format("%Y-%m-%d"))  ;
+				
+				//.tickSize(0, -(height), 0).tickSubdivide(true);
+				
 				
 
 				var itemHeight = (height() - margin.top +- margin.bottom)/levels;
 
 				var last = 0,
 						current = 0;
-
+				
+				
+				
+				
 				var items = g.selectAll('g.itemGroup')
 					.data(d3.entries(groups).sort(sortBy))
 					
@@ -140,37 +148,69 @@
 							last += d.value.length * itemHeight + 15;
 							return "translate(" + 0 + "," + (margin.top + current + 6 ) + ")";
 						});
+			
 
 				colors.domain(values, function(d){ return d.color; });
 			    	
-
+				g.append('g')
+				  	
+				  	.attr("transform", "translate(" + 0 + "," + (margin.top + 20 + itemHeight * levels) + ")")
+				  	.attr("class","axis")
+						.style("stroke-width", "0,5px")
+        		.style("font-size","5 px")
+        		.style("fill","black")
+        		.style("font-family","Arial, Helvetica")
+			  		.call(xAxis)
+			  		;
+			  		
+				items.append("rect")
+					.attr('width', 1000)
+			   	    .attr('height',  function(d){ return d.value.length * itemHeight - 15  ; })
+			   	    .style('fill',"	#F8F8FF")
+			   	    .attr('stroke', "#fff")
+			   	    
+				
+				
 				items.append('line')
 					.attr('x1',0)
 					.attr('y1', -15)
 					.attr('x2', width())
 					.attr('y2', -15)
 					.style("shape-rendering","crispEdges")
-					.attr('stroke', "Maroon")
+					.attr('stroke', "DarkGrey ")
 					.attr('stroke-width', 10);
-					
-					/*'#F8F8FF'*/
+		
+							
+				
+				items.append("rect")
+					.attr('width', 30)
+			   	    .attr('height',  function(d){ return d.value.length * itemHeight - 15  ; })
+			   	    .style('fill',"black")
+			   	    .append("title")
+			   	    .text(function(d){ return d.key; })
+			   	    
 
 				items.append('text')
 					.text(function(d){ return d.key; })
-					.style("font-size","11px")
-					.style("fill","#FFF")
-					.style("stroke","black")
-        	.style("font-family","Arial, Helvetica")
-					.attr('x', margin.left-10)
-		  		.attr('y', 0)
-		  		.attr('dy', function(d) { return (d.value.length * itemHeight)/2; })
-		  		.attr('text-anchor', 'end')
-		  		.attr('class', 'groupText');
+					.style("font-size","14px")
+					.style("fill","white")
+					
+					.attr("transform", "rotate(-90)" )
+					
+        		    .style("font-family","Arial, Helvetica")
+					.attr('x',function(d) { return (d.value.length - itemHeight) / 2 - 80; })
+		  		    .attr('y', 0)
+		  		//.attr('dy', function(d) { return (d.value.length * itemHeight)/2; })
+		  		    .attr('dy', 20 )
+		  		    .attr('text-anchor', 'start')
+		  		    .attr('class', 'groupText');
 
-				var g2 = items.selectAll('g')
-					.data(function(d){ var p = []; d.value.forEach(function(dd){ p = p.concat(dd); }); return p; });
+			   	var g2 = items.selectAll('g')
+					.data(function(d){ var p = []; d.value.forEach(function(dd){ p = p.concat(dd); }); return p; });	
 				
-				var gEnter = g2.enter().append("g");
+				var gEnter = g2.enter().append("g");				
+				
+				
 				
 				gEnter.append('rect')
 					.attr('x', function(d) { return x(d.start); })
@@ -225,25 +265,38 @@
 			    
 			//d3.svg.axis().scale(x)
 				
-				g.append('g')
-				  	.attr('transform', 'translate(0,' + (margin.top + 20 + itemHeight * levels)  +   ')')
-				  	.attr("class","axis")
-						.style("stroke-width", "0,5px")
-        		.style("font-size","5 px")
-        		.style("fill","#6495ED")
-        		.style("font-family","Arial, Helvetica")
-			  		.call(xAxis);
+				
+			  		
+			  		/*.enter()
+    				.append("line")
+   		  			   .attr(
+       						 {
+            					"class":"line grid tick",
+          					    "x1" : margin.right,
+         					    "x2" : width,
+         					    "y1" : function(d){ return yScale(d);},
+        					    "y2" : function(d){ return yScale(d);},
+     					    }); */
+    
+			  	
+			 
+               	
+			  	
 
-        d3.selectAll(".axis line, .axis path")
+        d3.selectAll(".axis line, .axis path, .x.axis line, .x.axis path")
          	.style("shape-rendering","crispEdges")
          	.style("fill","none")
-         	.style("stroke","#ccc")
+         	.style("stroke","#ccc") 
 
-        function sortBy(a,b){
+
+       function sortBy(a,b){
             if (sort() == 'Start date (descending)') return a.value[0][0].start - b.value[0][0].start;
             if (sort() == 'Start date (ascending)') return b.value[0][0].start - a.value[0][0].start;
             if (sort() == 'Name') return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
         }
+        
+
+                                   
 
     })
 
