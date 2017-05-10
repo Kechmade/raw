@@ -14,12 +14,12 @@
 
 	var width = chart.number()
 		.title("Width")
-		.defaultValue(800)
+		.defaultValue(1000)
 		//.fitToWidth(true)
 
 	var height = chart.number()
 		.title("Height")
-		.defaultValue(800)
+		.defaultValue(1000)
 
 	var maxRadius = chart.number()
 		.title("max radius")
@@ -47,7 +47,7 @@
 			.attr("height", +height() )
 			.append("g")
 
-		var marginLeft = d3.max([maxRadius(),(d3.max(data, function (d) { return (Math.log(d.y) / 2.302585092994046) + 1; }) * 9)]),
+		var marginLeft = 50 +  d3.max([maxRadius(),(d3.max(data, function (d) { return (Math.log(d.y) / 2.302585092994046) + 1; }) * 9)]),
 			marginBottom = 20,
 			w = width() - marginLeft,
 			h = height() - marginBottom;
@@ -56,41 +56,51 @@
 			yExtent = !useZero()? d3.extent(data, function (d){ return d.y; }) : [-d3.max(data, function (d){ return d.y; }), d3.max(data, function (d){ return d.y; })];
 
 		var xScale = x.type() == "Date"
-				? d3.time.scale().range([marginLeft,width()-maxRadius()]).domain(xExtent)
-				: d3.scale.linear().range([marginLeft,width()-maxRadius()]).domain(xExtent),
+				? d3.time.scale().range([120,width()-120-maxRadius()]).domain(xExtent)
+				: d3.scale.linear().range([120,width()-maxRadius()-120]).domain(xExtent),
 			yScale = y.type() == "Date"
-				? d3.time.scale().range([h-maxRadius(), maxRadius()]).domain(yExtent)
-				: d3.scale.linear().range([h-maxRadius(), maxRadius()]).domain(yExtent),
+				? d3.time.scale().range([h - 105- marginLeft - maxRadius(), 200]).domain(yExtent)
+				: d3.scale.linear().range([h- 105 -marginLeft - maxRadius() , 200 ]).domain(yExtent),
 			sizeScale = d3.scale.linear().range([1, Math.pow(+maxRadius(),2)*Math.PI]).domain([0, d3.max(data, function (d){ return d.size; })]),
 			xAxis = d3.svg.axis().scale(xScale);
     		yAxis = d3.svg.axis().scale(yScale).orient("left");
-
-
+						
+		
         g.append("g")
             .attr("class", "x axis")
-            .style("stroke-width", "1px")
-        	.style("font-size","10px")
+            .style("stroke-width", "5px")
+        	//.style("font-size","9px")
         	.style("font-family","Arial, Helvetica")
-            .attr("transform", "translate(" + 0 + "," + (h/2) + ")")
-            .call(xAxis);
+            .attr("transform", "translate(" + 0 + "," + (height()/2) + ")")
+            
+            .call(xAxis).selectAll("text").remove();
 
       	g.append("g")
             .attr("class", "y axis")
-            .style("stroke-width", "1px")
-            .style("font-size","10px")
+            .style("stroke-width", "5px")
+           // .style("font-size","9px")
 			.style("font-family","Arial, Helvetica")
-            .attr("transform", "translate(" + w/2 + "," + 0 + ")")
-            .call(yAxis);
+            .attr("transform", "translate(" + (width()/2) + "," + 0 + ")")
+            
+            .call(yAxis).selectAll("text").remove();
 
         d3.selectAll(".y.axis line, .x.axis line, .y.axis path, .x.axis path")
          	.style("shape-rendering","crispEdges")
          	.style("fill","none")
          	.style("stroke","#ccc")
+         	
+         	
+         
 
 		var circle = g.selectAll("g.circle")
 			.data(data)
 			.enter().append("g")
 			.attr("class","circle")
+			
+	    var rect = g.selectAll("g.rect")
+	    	.data(data)
+	    	.enter().append("g")
+	    	.attr("class","rect")
 
 		var point = g.selectAll("g.point")
 			.data(data)
@@ -114,10 +124,122 @@
     	circle.append("text")
     	    .attr("transform", function(d) { return "translate(" + xScale(d.x) + "," + yScale(d.y) + ")"; })
     		.attr("text-anchor", "middle")
-    		.style("font-size","10px")
+    		.style("font-size","20px")
     		.attr("dy", 15)
     		.style("font-family","Arial, Helvetica")
     	  	.text(function (d){ return d.label? d.label.join(", ") : ""; });
+    	
+    	
+    	
+    		
+    	  	
+
+
+
+		g.append('line')
+					.attr('x1',100)
+					.attr('y1',  height()/2)
+					.attr('x2', width()-100)
+					.attr('y2',  height()/2)
+					.style("shape-rendering","crispEdges")
+					.attr('stroke', "DarkGrey ")
+					.attr('stroke-width', 10);
+		
+		g.append('line')
+					.attr('x1',width()/2)
+					.attr('y1', 100 )
+					.attr('x2', width()/2)
+					.attr('y2', height()-100 )
+					.style("shape-rendering","crispEdges")
+					.attr('stroke', "DarkGrey ")
+					
+					.attr('stroke-width', 10); 
+
+    		g.append("rect")
+					.attr('width', 80)
+			   	    .attr('height', height()/3)
+			   	    .attr('x',  3)
+			   	    .attr('y', height()/3 )
+			   	    .style('fill',"#F5FFFA")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5');
+		   
+		  
+	// coins à transformer		   	    
+		g.append("rect")
+					.attr('width', 200)
+			   	    .attr('height',  60)
+			   	    .attr('x', 80)
+			   	    .attr('y', 80)
+			   	    .style('fill',"		#FFF5EE")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5');
+			   	    
+			  	    
+		g.append("rect")
+					.attr('width', 200 )
+			   	    .attr('height',60)
+			   	    .attr('x',  80)
+			   	    .attr('y', height()-160)
+			   	    .style('fill',"	#FFF5EE")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5');
+			   	    
+			   	    
+	   g.append("rect")
+					.attr('width', 200)
+			   	    .attr('height',  60)
+			   	    .attr('x',  width()-280)
+			   	    .attr('y', 80 )
+			   	    .style('fill',"		#FFF5EE")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5');
+			   	    
+			  	    
+		g.append("rect")
+					.attr('width', 200 )
+			   	    .attr('height',60)
+			   	    .attr('x',   width()-280)
+			   	    .attr('y', height()-160)
+			   	    .style('fill',"	#FFF5EE")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5');
+			   	    
+			g.append("rect")
+					.attr('width', width()/3)
+			   	    .attr('height',  80)
+			   	    .attr('x',  width()/3)
+			   	    .attr('y', height()-83 )
+			   	    .style('fill',"#F5FFFA")
+			   	    .style('stroke','DarkGrey')
+			   	    .style('stroke-width','5'); 
+			   	    
+			   	    var dataw = [
+  						 { 'x' :   3, 'y': height()/3, "label" : "hada1" },
+  						 {'x': 80, 'y' : 80,  "label" : "hada2" },
+  						 {'x': 80, 'y' : height()-160 , "label" : "hada3" },
+						 {'x' : width()-280, 'y' : 80,  "label" : "hada4" },
+  					 	 {'x' :  width()-280,'y' :  height()-160, "label" : "hada5" },
+  				 		 {'x' : width()/3, 'y' :  height()-83, "label" : "hada6" } ];
+ 		
+ 		var text = chart.selectAll("text")
+                       .data(dataw)
+                        .enter()
+                        .append("text");
+                        
+        var textLabels = text
+                .attr("x", function(d) { return d.x; })
+				.attr("y", function(d) { return d.y; })
+                .text( function (d) { return  label; })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "20px")
+                .attr("fill", "red");
+    	
+    	rect.append("text")
+    		.attr("text-anchor","middle")
+    		.style("font-size","20px")
+    		.text(function (d){ return dataw.label? dataw.label.join(", ") : ""; });
+		
 
 	})
 
